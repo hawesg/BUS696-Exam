@@ -71,12 +71,146 @@ mpg %>%
 
 ## Line
 
-**TODO : Write about lines**
+In a line graph, observations are ordered by x value and connected.
+
+The functions `geom_line()`, `geom_step()`, or `geom_path()` can be used.
+
+x value (for x axis) can be :
+
+* date : for a time series data
+* texts
+* discrete numeric values
+* continuous numeric values
+
+Data derived from ToothGrowth data sets are used. ToothGrowth describes the effect of Vitamin C on tooth growth in Guinea pigs.
+
+* len - Tooth Length
+* dose - Dose in mg (0.5, 1, 2)
+
+See more [here](http://www.sthda.com/english/wiki/ggplot2-line-plot-quick-start-guide-r-software-and-data-visualization)
+
+``` {r out.width=c('33%', '33%', '33%'), fig.show='hold'}
+df <- data.frame(dose=c("D0.5", "D1", "D2"),
+                len=c(4.2, 10, 29.5))
+head(df)
+
+# Basic line plot with points
+ggplot(data=df, aes(x=dose, y=len, group=1)) +
+  geom_line()+
+  geom_point()
+
+# Change the line type
+ggplot(data=df, aes(x=dose, y=len, group=1)) +
+  geom_line(linetype = "dashed")+
+  geom_point()
+
+# Change the color
+ggplot(data=df, aes(x=dose, y=len, group=1)) +
+  geom_line(color="red")+
+  geom_point()
+
+```
+
+Observations can be also connected using the functions `geom_step()` or `geom_path()` :
+
+``` {r out.width=c('50%', '50%'), fig.show='hold'}
+
+ggplot(data=df, aes(x=dose, y=len, group=1)) +
+  geom_step()+
+  geom_point()
+
+ggplot(data=df, aes(x=dose, y=len, group=1)) +
+  geom_path()+
+  geom_point()
+
+```
+
 
 ## Error Bars
+```{r error_setup, echo=FALSE}
+movies <- movies %>% filter(budget < 400000000) 
+movies <- movies %>% 
+  mutate(genre_main = unlist(map(strsplit(as.character(movies$genres),"\\|"),1)),
+         grossM = gross / 1000000,
+         budgetM = budget / 1000000) 
+movies <- movies %>% mutate(genre_main = factor(genre_main) %>% fct_drop()) 
+movies <- movies %>% mutate(profitM = grossM - budgetM,
+                            ROI = profitM/budgetM)
+Genre_ROI <- movies %>% 
+  group_by(genre_main) %>% 
+  summarize(n = n(), 
+            ROI_avg = mean(ROI, na.rm = TRUE), 
+            se_ROI = sd(ROI, na.rm = TRUE)/sqrt(n)) %>% 
+  arrange(desc(ROI_avg))
+```
 
-**TODO : Write about Error Bars**
 
-## Theme 
+``` {r error_bars}
+ggplot( Genre_ROI, aes(y = ROI_avg, 
+                      x = genre_main) ) + 
+  geom_bar( stat = "identity" ) + 
+  coord_flip() + 
+  ggtitle( "Best Performing Genre By ROI" ) + 
+  geom_errorbar( mapping = aes( ymin = ROI_avg - se_ROI, 
+                                ymax = ROI_avg + se_ROI ) )
+```
 
-**TODO: Write about themes**
+## Themes {.tabset}
+`library("ggthemes")` [docs](https://www.rdocumentation.org/packages/ggthemes/versions/3.5.0)
+
+[Theme Library](https://www.datanovia.com/en/blog/ggplot-themes-gallery/)
+
+Base example
+
+```{r echo=FALSE}
+library(ggplot2)
+library(ggthemes)
+
+# In this example we will use the open repository of plants classification Iris. 
+data("iris")
+str(iris)
+ggplot() + geom_point(data = iris, aes(x = Petal.Width, y = Petal.Length,color = Species))
+```
+
+### ggthemes
+```{r}
+# For the complete list of themes in the package check
+ls("package:ggthemes")[grepl("theme_", ls("package:ggthemes"))]
+```
+
+### Calc Theme
+```{r}
+# Theme similar to the default settings of LibreOffice Calc 
+ggplot() + geom_point(data = iris, aes(x = Petal.Width, y = Petal.Length,color = Species)) + theme_calc()
+```
+
+### The economist theme
+```{r}
+# Style plots similar to those in The Economist
+ggplot() + geom_point(data = iris, aes(x = Petal.Width, y = Petal.Length,color = Species)) + 
+  theme_economist()
+```
+
+### The economist white theme
+```{r}
+# Style plots similar to those in The Economist
+ggplot() + geom_point(data = iris, aes(x = Petal.Width, y = Petal.Length,color = Species)) + theme_economist_white()
+```
+
+### Few theme
+```{r}
+# Theme based on the rules and examples in Stephen Few, "Practical rules for using colors in charts"
+ggplot() + geom_point(data = iris, aes(x = Petal.Width, y = Petal.Length,color = Species)) + theme_few()
+```
+
+### Solarized theme
+```{r}
+# Check http://ethanschoonover.com/solarized for a description of the solarized palette
+ggplot() + geom_point(data = iris, aes(x = Petal.Width, y = Petal.Length,color = Species)) + theme_solarized()
+```
+
+### gdocs theme
+```{r}
+# Theme similar to the default used in google docs
+ggplot() + geom_point(data = iris, aes(x = Petal.Width, y = Petal.Length,color = Species)) + theme_gdocs()
+```

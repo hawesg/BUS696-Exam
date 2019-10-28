@@ -17,10 +17,9 @@ output:
       before_body: header.html
 ---
 
-<div class="btn-group" role="group" aria-label="...">
-  <a href="exam-dark.html" class="btn btn-default">Dark</a>
-  <a href="" class="btn btn-info">Light</a>
-</div>
+```{r, echo=FALSE}
+templateFile <- "light"
+```
 
 ```{r child = 'main.Rmd'}
 ```

@@ -7,6 +7,14 @@ library("magrittr")
 
 ```
 
+# Themes for this doc
+
+<div class="btn-group" role="group" aria-label="...">
+  <a href="exam-dark.html" class="btn btn-`r ifelse(templateFile == "dark", "info disabled", "default")`">Dark</a>
+  <a href="exam-light.html" class="btn btn-`r ifelse(templateFile == "light", "info disabled", "default")`">Light</a>
+  <a href="exam-material.html" class="btn btn-`r ifelse(templateFile == "material", "info disabled", "default")`">Material</a>
+</div>
+
 # Basics {.tabset .tabset-fade .tabset-pills}
 
 ```{r child = 'basics.Rmd'}
@@ -29,7 +37,14 @@ library("magrittr")
 ```{r child = 'plot.Rmd'}
 ```
 
-# Regression {.tabset .tabset-pills .tabset-fade}
+
+# Classification and Resampling {.tabset .tabset-pills .tabset-fade}
+
+```{r child = 'classification.Rmd'}
+```
+
+
+# Classification and Regression {.tabset .tabset-pills .tabset-fade}
 
 ```{r child = 'regression.Rmd'}
 ```

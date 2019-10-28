@@ -6,6 +6,14 @@ movies <- read.csv(here("datasets","movie_metadata.csv"))
 gmsc_train <- read.csv(here("datasets","gmsc_cs-training.csv"))
 ```
 
+## Setup Test/Train
+``` {r test_train}
+train_idx <- sample(1:nrow(movies),size = floor(0.75*nrow(movies)))
+movies_train <- movies %>% slice(train_idx)
+movies_test <- movies %>% slice(-train_idx)
+```
+Where 0.75 is the percentage (75%) of the data to put in the Training set.
+
 ## Containers
 
 ```{r containers}
