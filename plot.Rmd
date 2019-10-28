@@ -59,6 +59,16 @@ ggplot(diamonds, aes(carat)) +
   geom_histogram()
 ```
 
+## Box Plot
+
+``` {r boxplot}
+mpg %>%
+  ggplot( aes(x=reorder(class, hwy), y=hwy, fill=class)) + 
+    geom_boxplot() +
+    xlab("class") +
+    theme(legend.position="none")
+```
+
 ## Line
 
 **TODO : Write about lines**

@@ -1,0 +1,39 @@
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library("plyr")
+library("readr")
+library("tidyverse")
+library("magrittr")
+
+```
+
+# Basics {.tabset .tabset-fade .tabset-pills}
+
+```{r child = 'basics.Rmd'}
+```
+
+
+# dplyr (Data Manipulation) {.tabset .tabset-pills .tabset-fade}
+
+```{r child = 'dplyr.Rmd'}
+```
+
+
+# magrittr (pipe opperator)
+
+```{r child = 'magrittr.Rmd'}
+```
+
+# Plot {.tabset .tabset-pills .tabset-fade}
+
+```{r child = 'plot.Rmd'}
+```
+
+# Regression {.tabset .tabset-pills .tabset-fade}
+
+```{r child = 'regression.Rmd'}
+```
+
+# ForCats (working with factors) 
+```{r child = 'forcats.Rmd'}
+```

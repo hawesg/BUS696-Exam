@@ -1,0 +1,29 @@
+---
+title: "Exam Reference - Cerulean"
+author: "Garrett Hawes"
+date: "10/25/2019"
+output: 
+  html_document:
+    toc: true
+    number_sections: true
+    df_print: paged
+    toc_float:
+      collapsed: false
+      smooth_scroll: false
+    theme: cerulean
+    highlight: tango
+    includes:
+      after_body: footer.html
+      before_body: header.html
+---
+
+<div class="btn-group" role="group" aria-label="...">
+  <a href="exam-dark.html" class="btn btn-default">Dark</a>
+  <a href="" class="btn btn-info">Light</a>
+</div>
+
+```{r child = 'main.Rmd'}
+```
+
+
+

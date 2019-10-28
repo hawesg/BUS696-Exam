@@ -1,0 +1,29 @@
+---
+title: "Exam Reference - Darkly"
+author: "Garrett Hawes"
+date: "10/25/2019"
+output: 
+  html_document:
+    toc: true
+    number_sections: true
+    df_print: paged
+    toc_float:
+      collapsed: false
+      smooth_scroll: false
+    theme: darkly
+    highlight: espresso
+    includes:
+      after_body: footer.html
+      before_body: header.html
+---
+
+<div class="btn-group" role="group" aria-label="...">
+  <a href="" class="btn btn-info">Dark</a>
+  <a href="exam-light.html" class="btn btn-default">Light</a>
+</div>
+
+```{r child = 'main.Rmd'}
+```
+
+
+

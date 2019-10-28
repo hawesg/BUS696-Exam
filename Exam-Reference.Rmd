@@ -1,0 +1,11 @@
+---
+title: "Exam Reference"
+output: html_document
+---
+
+# I have broken this out into two different themese click below. 
+
+<div class="btn-group" role="group" aria-label="...">
+  <a href="exam-dark.html" class="btn btn-default">Dark</a>
+  <a href="exam-light.html" class="btn btn-default">Light</a>
+</div>

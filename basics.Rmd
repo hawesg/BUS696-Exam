@@ -1,6 +1,6 @@
 ## Reading Data 
 
-```{r read}
+```{r read, message=FALSE}
 library(here)
 movies <- read.csv(here("datasets","movie_metadata.csv"))
 gmsc_train <- read.csv(here("datasets","gmsc_cs-training.csv"))
