@@ -1,0 +1,72 @@
+## ggplot
+
+`ggplot2` is a system for declaratively creating graphics, based on The [Grammar of Graphics](http://amzn.to/2ef1eWp). You provide the data, tell `ggplot2` how to map variables to aesthetics, what graphical primitives to use, and it takes care of the details.
+
+It’s hard to succinctly describe how ggplot2 works because it embodies a deep philosophy of visualisation. However, in most cases you start with [ggplot()](https://ggplot2.tidyverse.org/reference/ggplot.html), supply a dataset and aesthetic mapping (with [aes()](https://ggplot2.tidyverse.org/reference/aes.html)). You then add on layers (like [geom_point()](https://ggplot2.tidyverse.org/reference/geom_point.html) or [geom_histogram()](https://ggplot2.tidyverse.org/reference/geom_histogram.html)), scales (like [scale_colour_brewer()](https://ggplot2.tidyverse.org/reference/scale_brewer.html)), faceting specifications (like [facet_wrap()](https://ggplot2.tidyverse.org/reference/facet_wrap.html)) and coordinate systems (like [coord_flip()](https://ggplot2.tidyverse.org/reference/coord_flip.html)).
+
+[CHEATSHEET](https://github.com/rstudio/cheatsheets/blob/master/data-visualization-2.1.pdf)
+
+## Scatter
+```{r scatter}
+
+ggplot(mpg, aes(displ, hwy, colour = class)) + 
+  geom_point()
+
+ggplot(data = movies) + 
+  geom_point(mapping = aes(x = imdb_score, 
+                             y = budget) )
+```
+
+## Bar Plot
+
+`geom_bar` makes the height of the bar proportional to the number of cases in each group (or if the weight aesthetic is supplied, the sum of the `weights`). If you want the heights of the bars to represent values in the data, use `geom_col()` instead. `geom_bar()` uses `stat_count()` by default: it counts the number of cases at each x position. `geom_col()` uses `stat_identity()`: it leaves the data as is.
+
+```{r bar}
+ggplot(gmsc_train, 
+       aes(y = SeriousDlqin2yrs, x = age)) + 
+  geom_bar(stat = "identity", fill = "red") +
+  ggtitle("Serious Delinquencies in 2 years vs By Age") + 
+  labs(x = "Age", y = "Serious Delinquencies in 2 years") 
+
+ggplot(gmsc_train, 
+       aes(y = SeriousDlqin2yrs, 
+           x = NumberRealEstateLoansOrLines)) + 
+  geom_col(fill = "red") +
+  ggtitle("Serious Delinquencies in 2 years vs Number of Loans or Lines") + 
+  labs(x = "Number of Real Estate Loans Or Lines", y = "Serious Delinquencies in 2 years")
+```
+
+## Jitter
+
+The jitter geom is a convenient shortcut for `geom_point(position = "jitter")`. It adds a small amount of random variation to the location of each point, and is a useful way of handling overplotting caused by discreteness in smaller datasets.
+
+``` {r jitter}
+
+ggplot(gmsc_train, aes( x = MonthlyIncome, 
+                        y = SeriousDlqin2yrs)) + 
+  geom_jitter(alpha = 1/10, color = "hotpink") + 
+  xlim(0, 100000) +
+  ggtitle("Serious Delinquencies in 2 years vs Monthly Income") +
+  labs(x = "Monthly Income", y = "Serious Delinquencies in 2 years")
+```
+
+## Histogram
+
+Visualise the distribution of a single continuous variable by dividing the x axis into bins and counting the number of observations in each bin. Histograms (`geom_histogram()`) display the counts with bars; frequency polygons (`geom_freqpoly()`) display the counts with lines. Frequency polygons are more suitable when you want to compare the distribution across the levels of a categorical variable.
+
+``` {r histogram} 
+ggplot(diamonds, aes(carat)) +
+  geom_histogram()
+```
+
+## Line
+
+**TODO : Write about lines**
+
+## Error Bars
+
+**TODO : Write about Error Bars**
+
+## Theme 
+
+**TODO: Write about themes**
