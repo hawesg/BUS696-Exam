@@ -4,9 +4,11 @@ date: "`r Sys.Date()`"
 output:
   rmdformats::material:
     highlight: kate
+  number_sections: true
+  df_print: paged
   includes:
-    after_body: footer.html
-    before_body: header.html
+    after_body: html_includes/footer.html
+    before_body: html_includes/header.html
 ---
 
 
@@ -28,5 +30,5 @@ templateFile <- "material"
 ```
 
 
-```{r child = 'main.Rmd'}
+```{r child = 'parts/main.Rmd'}
 ```

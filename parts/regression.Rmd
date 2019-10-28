@@ -1,0 +1,270 @@
+You can use str to get info about what is contained in a model ie: `str(mod1)`
+## Setup Test/Train
+``` {r}
+train_idx <- sample(1:nrow(movies),size = floor(0.75*nrow(movies)))
+movies_train <- movies %>% slice(train_idx)
+movies_test <- movies %>% slice(-train_idx)
+```
+Where 0.75 is the percentage (75%) of the data to put in the Training set.
+
+## Linear Regression
+**Linear regression** is a **linear** approach to modeling the relationship between a scalar response (or dependent variable) and one or more explanatory variables (or independent variables). The case of one explanatory variable is called simple **linear regression**. Generate a linear model with `lm()`, desired formula is written with the dependant variable followed by ~ and then a list of the independant variables Can use . for all, or do something like `y ~ -director` 
+Can get the coefficients like this `mod1$coefficients[1]`
+
+``` {r lm}
+mod1 <- lm(gross ~ budget + duration, data = movies_train)
+summary(mod1)
+```
+
+## Logistic Regression
+**Logistic regression** is a statistical model that in its basic form uses a **logistic** function to model a binary dependent variable, although many more complex extensions exist. In **regression** analysis, **logistic regression** (or **logit regression**) is estimating the parameters of a **logistic model** (a form of binary **regression**). Use function `glm()` notice the `family = binomial`
+
+``` {r glm}
+library(ISLR)
+data(Default)
+options(scipen=9)
+logitMod1 <- glm(factor(default) ~ balance, 
+               family = binomial,
+               data = Default)
+
+summary(logitMod1)
+round(logitMod1$coefficients,4)
+
+logitMod2 <- glm(factor(default) ~ balance  + student + income, 
+               family = binomial,
+               data = Default)
+
+
+```
+
+## Ridge Regression
+``` {r}
+library(glmnet)
+library(glmnetUtils)
+
+# load the movies dataset
+library('tidyverse')
+options(scipen = 50)
+set.seed(1861)
+movies <- read.csv(here::here("datasets","movie_metadata.csv"))
+movies <- movies %>% filter(budget < 400000000) %>% 
+  filter(content_rating != "",
+         content_rating != "Not Rated",
+         !is.na(gross)) 
+movies <- movies %>% 
+  mutate(genre_main = unlist(map(strsplit(as.character(movies$genres),"\\|"),1)),
+         grossM = gross / 1000000,
+         budgetM = budget / 1000000,
+         profitM = grossM - budgetM)
+movies <- movies %>% mutate(genre_main = fct_lump(genre_main,5),
+                            content_rating = fct_lump(content_rating,3),
+                            country = fct_lump(country,2),
+                            cast_total_facebook_likes000s = 
+                              cast_total_facebook_likes / 1000,) %>%   drop_na()
+
+train_idx <- sample(1:nrow(movies),size = floor(0.75*nrow(movies)))
+movies_train <- movies %>% slice(train_idx)
+movies_test <- movies %>% slice(-train_idx)
+
+# estimate ridge mod 
+Ridge_mod <- cv.glmnet(profitM ~ ., 
+                       data = movies_train %>% 
+                         select(-c(director_name,actor_1_name,
+                                   actor_2_name,actor_3_name,
+                                   plot_keywords,movie_imdb_link,
+                                   country,budgetM,grossM, genres,
+                                   language, movie_title)),
+                       alpha = 0)
+
+coef(Ridge_mod)
+
+# explore how coefficients change as we change lambda
+library(coefplot)
+coefpath(Ridge_mod)
+
+```
+
+## Lasso Regression
+``` {r} 
+library(glmnet)
+library(glmnetUtils)
+
+# load the movies dataset
+library('tidyverse')
+options(scipen = 50)
+set.seed(1861)
+movies <- read.csv(here::here("datasets","movie_metadata.csv"))
+movies <- movies %>% filter(budget < 400000000) %>% 
+  filter(content_rating != "",
+         content_rating != "Not Rated",
+         !is.na(gross)) 
+movies <- movies %>% 
+  mutate(genre_main = unlist(map(strsplit(as.character(movies$genres),"\\|"),1)),
+         grossM = gross / 1000000,
+         budgetM = budget / 1000000,
+         profitM = grossM - budgetM)
+movies <- movies %>% mutate(genre_main = fct_lump(genre_main,5),
+                            content_rating = fct_lump(content_rating,3),
+                            country = fct_lump(country,2),
+                            cast_total_facebook_likes000s = 
+                              cast_total_facebook_likes / 1000) %>%   
+  drop_na() %>% select(-c(director_name,actor_1_name,
+                         actor_2_name,actor_3_name,
+                         plot_keywords,movie_imdb_link,
+                         country,budgetM,grossM, genres,
+                         language, movie_title, budget, gross))
+
+train_idx <- sample(1:nrow(movies),size = floor(0.75*nrow(movies)))
+movies_train <- movies %>% slice(train_idx)
+movies_test <- movies %>% slice(-train_idx)
+# estimate Lasso mod 
+Lasso_mod <- 
+  
+  cv.glmnet(profitM ~ ., 
+            data = movies_train,
+            alpha = 1)
+
+coef(Lasso_mod, 
+     s = Lasso_mod$lambda.min)
+
+coef(Lasso_mod, 
+     s = Lasso_mod$lambda.1se)
+
+# put in a matrix
+coef_mat <- data.frame(
+  varname = rownames(coef(Lasso_mod)) %>% 
+    data.frame(),
+  Lasso_min = as.matrix(coef(Lasso_mod, 
+                             s = Lasso_mod$lambda.min)) %>% 
+    round(3),
+  Lasso_1se = as.matrix(coef(Lasso_mod, 
+                             s = Lasso_mod$lambda.1se)) %>% 
+    round(3)
+) %>% rename(varname = 1, 
+             Lasso_min = 2, 
+             Lasso_1se = 3)  %>% 
+  remove_rownames()
+
+coef_mat
+
+plot(Lasso_mod)
+
+# place in one coef
+
+
+# explore how coefficients 
+# change as we change lambda
+library(coefplot)
+coefpath(Lasso_mod)
+```
+
+## ElasticNet
+```{r}
+alpha_list <- seq(0,1,len = 5)
+alpha_list
+
+enet_fit <- cva.glmnet(profitM ~ . ,
+                       data = movies_train,
+                       alpha = alpha_list)
+
+enet_fit
+
+minlossplot(enet_fit)
+
+plot(enet_fit)
+
+# look at each individual model
+plot(enet_fit$modlist[[4]])
+
+# view coefficients
+coef(enet_fit, alpha = 0.75) %>% 
+  round(3)
+
+# if we want the lambda.min version
+coef(enet_fit, alpha = 0.75, 
+     s = enet_fit$modlist[[4]]$lambda.min)
+
+coef(enet_fit, alpha = 1) %>% 
+  round(3)
+
+enet_coefs <- data.frame(
+  varname = rownames(coef(enet_fit,alpha = 0)),
+  ridge = as.matrix(coef(enet_fit, alpha = 0)) %>% round(3),
+  alpha025 = as.matrix(coef(enet_fit, alpha = 0.25)) %>% round(3),
+  alpha05 = as.matrix(coef(enet_fit, alpha = 0.5)) %>% round(3),
+  alpha075 = as.matrix(coef(enet_fit, alpha = 0.75)) %>% round(3),
+  lasso = as.matrix(coef(enet_fit, alpha = 1)) %>% round(3)
+) %>% rename(varname = 1, ridge = 2, alpha025 = 3, alpha05 = 4, alpha075 = 5, lasso = 6) %>% 
+  remove_rownames()
+```
+
+## Predict
+
+``` {r predict}
+scores <- predict(logitMod1,
+                  type = "response")
+head(scores)
+
+preds_DF <- data.frame(
+  scores_mod1 = predict(logitMod1, type = "response"),
+  scores_mod2 = predict(logitMod2, type = "response"),
+  Default
+)                                             
+```
+
+## Confusion Matrix
+
+``` {r confusion_matrix}
+library('caret')
+confusionMatrix(factor(ifelse(preds_DF$scores_mod1 > 0.5,"Yes","No"),  
+                       levels = c("Yes", "No")),
+                factor(preds_DF$default, 
+                       levels = c("Yes","No") ) )
+
+```
+
+## ROC Curve
+
+``` {r roc}
+
+TrainDF <- data.frame(default = c(Default$default, Default$default),
+                      scores = c(preds_DF$scores_mod1,
+                                     preds_DF$scores_mod2),
+                      models = c(rep("X = Student",length(preds_DF$scores_mod1)),
+                                 rep("X = Student + Balance + Income",
+                                     length(preds_DF$scores_mod2))))
+
+
+library(ggplot2)
+library('plotROC')
+TrainROC <- ggplot(TrainDF, aes(m = scores, d = default, color = models)) + 
+  geom_roc(show.legend = TRUE, labelsize = 3.5, cutoffs.at = c(.99,.9,.7,.5,.3,.1,0))
+TrainROC <- TrainROC + style_roc(theme = theme_grey) +
+  theme(axis.text = element_text(colour = "blue")) +
+  theme(legend.justification = c(1, 0), 
+        legend.position = c(1, 0),
+        legend.box.margin=margin(c(50,50,50,50)))
+plot(TrainROC)
+
+```
+
+## Calibration Plot
+
+load `library(plyr)` before `library(tidyverse)`
+
+```{r calibration_plot}
+
+
+scores3DF <- data.frame(default = ifelse(Default$default == "Yes",1,0),
+                        scores = preds_DF$scores_mod2)
+
+calData <- ddply(scores3DF, .(cut(scores3DF$scores, c(0,0.05,0.15,0.25,0.35,0.45,0.55,0.65,0.75,0.85,0.95,1))), colwise(mean))
+calData$midpoint <- c(0.025,.1,.2,.3,.4,.5,.6,.7,.8,.9,.975)
+colnames(calData) <- c("preds", "true", "midpoint")
+calPlot <- ggplot(calData, aes(x = midpoint, y = true)) + geom_point() + ylim(0,1) + 
+                  geom_abline(intercept = 0, slope = 1, color = "red") + 
+                  xlab("Prediction midpoint") + ylab("Observed event percentage"
+                 )
+
+plot(calPlot)
+```

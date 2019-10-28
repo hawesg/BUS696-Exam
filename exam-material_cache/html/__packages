@@ -1,13 +1,13 @@
 base
-knitr
-rmdformats
+broom
+purrr
+boot
 plyr
 readr
 tidyverse
 ggplot2
 tibble
 tidyr
-purrr
 dplyr
 stringr
 forcats
@@ -19,8 +19,6 @@ lattice
 caret
 ROSE
 rsample
-broom
-boot
 leaps
 Matrix
 foreach
@@ -28,3 +26,5 @@ glmnet
 glmnetUtils
 coefplot
 plotROC
+knitr
+rmdformats
